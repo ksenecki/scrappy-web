@@ -16,18 +16,33 @@ const SearchableList = () => {
   const [games, setGames] = useState<Data[]>([]);
 
   const handleImport = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        setJsonData(JSON.parse(e.target?.result as string));
-      };
-      reader.readAsText(file);
-    }
+    const files = event.target.files;
+    if (!files) return;
+    const arrFiles = Array.from(files);
+    arrFiles.forEach((file) => {
+      try {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const fileContents = JSON.parse(e.target?.result as string);
+          setJsonData((prevState) => [...prevState, fileContents]);
+        };
+        reader?.readAsText(file);
+      } catch (error) {
+        console.log(error);
+      }
+    });
   };
 
   const handleSearch = () => {
-    const filteredData: Data[] = jsonData.filter((item: Data) => {
+    const dataToFilter: Data[] = [];
+    jsonData.map((item) => {
+      //no idea how to fix typings here for now ¯\_(ツ)_/¯
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      dataToFilter.push(...item);
+    });
+
+    const filteredData: Data[] = dataToFilter.filter((item: Data) => {
       return (
         item.shop?.toLowerCase().includes(searchTerm?.toLowerCase()) ||
         item.title?.toLowerCase().includes(searchTerm?.toLowerCase())
@@ -38,7 +53,7 @@ const SearchableList = () => {
 
   return (
     <div>
-      <input type="file" accept=".json" onChange={handleImport} />
+      <input type="file" multiple accept=".json" onChange={handleImport} />
       <br />
       <input
         type="text"
@@ -46,6 +61,7 @@ const SearchableList = () => {
         onChange={(e) => setTerm(e.target.value)}
       />
       <button onClick={handleSearch}>Search</button>
+
       <table>
         <thead>
           <tr>
