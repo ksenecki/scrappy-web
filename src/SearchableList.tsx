@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import styles from './style.module.css';
 
 interface Data {
   date: string;
@@ -33,6 +34,12 @@ const SearchableList = () => {
     });
   };
 
+  const handleKeyDown = (event: any) => {
+    if (event.key === 'Enter') {
+      handleSearch();
+    }
+  };
+
   const handleSearch = () => {
     const dataToFilter: Data[] = [];
     jsonData.map((item) => {
@@ -53,17 +60,28 @@ const SearchableList = () => {
 
   return (
     <div>
-      <input type="file" multiple accept=".json" onChange={handleImport} />
-      <br />
-      <input
-        type="text"
-        value={searchTerm}
-        onChange={(e) => setTerm(e.target.value)}
-      />
-      <button onClick={handleSearch}>Search</button>
-
-      <table>
-        <thead>
+      <header className={styles.header}>
+        <input
+          type="file"
+          multiple
+          accept=".json"
+          onChange={handleImport}
+          className={styles.importButton}
+        />
+        <br />
+        <input
+          type="text"
+          value={searchTerm}
+          onChange={(e) => setTerm(e.target.value)}
+          className={styles.searchInput}
+          onKeyDown={handleKeyDown}
+        />
+        <button onClick={handleSearch} className={styles.searchButton}>
+          Search
+        </button>
+      </header>
+      <table className={styles.table}>
+        <thead className={styles.thead}>
           <tr>
             <th>Title</th>
             <th>Availability</th>
@@ -71,10 +89,10 @@ const SearchableList = () => {
             <th>URL</th>
           </tr>
         </thead>
-        <tbody>
+        <tbody className={styles.tbody}>
           {games.map((item) => {
             return (
-              <tr key={item.url}>
+              <tr className={styles.gameRow} key={item.url}>
                 <td>{item.title}</td>
                 <td>{item.availability}</td>
                 <td>{item.price}</td>
